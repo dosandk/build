@@ -1,0 +1,1 @@
+in this folder we store the images are NOT included in the spritesheets

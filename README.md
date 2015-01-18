@@ -7,3 +7,5 @@ loftschool homework 3
 - bower install
 
 далее запускаем gulp watch - компилит jade, scss, сжимает картинки
+
+## Работа с Gulp
