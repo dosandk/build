@@ -1,23 +1,11 @@
 var gulp = require('gulp'),
     concat = require('gulp-concat'),
     minify = require('gulp-minify-css'),
-    mainBowerFiles = require('main-bower-files'),
-    gulpFilter = require('gulp-filter'),
-    cache = require('gulp-cache'),
-    rename = require('gulp-rename'),
     size = require('gulp-size'),
-    plumber = require('gulp-plumber'),
-    uncss = require('gulp-uncss'),
     uglify = require('gulp-uglify'),
+    rename = require('gulp-rename'),
     del = require('del'),
-    csscomb = require('gulp-csscomb'),
-    preprocess = require('gulp-preprocess'),
-    assetpaths = require('gulp-assetpaths'),
     jade = require('gulp-jade'),
-    htmlreplace = require('gulp-html-replace'),
-    imagemin = require('gulp-imagemin'),
-    pngquant = require('imagemin-pngquant'),
-    newer = require('gulp-newer'),
     connect = require('gulp-connect'),
     compass = require('gulp-compass');
 
@@ -47,7 +35,7 @@ var distPaths = {
 
 /* --------------- BUILD TASKS --------------- */
 
-gulp.task('buildApp', ['buildHTML', 'buildCss', 'buildJs', 'buildIMG', 'buildFonts', 'buildPHP']);
+gulp.task('buildApp', ['buildHTML', 'buildCss', 'buildJs']);
 
 gulp.task('cleanBuildDir', function (cb) {
     del([basePath.dist], cb);
@@ -55,32 +43,15 @@ gulp.task('cleanBuildDir', function (cb) {
 
 gulp.task('buildHTML', ['cleanBuildDir'], function() {
     gulp.src(appPaths.jade +'*.jade')
-        .pipe(plumber())
         .pipe(jade({pretty: true}))
-        .pipe(preprocess({context: { environment: 'production', DEBUG: true }}))
-        .pipe(htmlreplace({
-            'css': 'css/ui.min.css',
-            'js': 'js/ui.min.js'
-        }))
-        .pipe(assetpaths({
-            newDomain: '.',
-            oldDomain : 'old-domain',
-            docRoot : basePath.dist,
-            filetypes : ['png', 'jpg']
-        }))
         .pipe(gulp.dest(basePath.dist))
 });
 
 gulp.task('buildCss', ['buildHTML'], function() {
     return gulp.src([appPaths.css + '**'])
-        .pipe(plumber())
         .pipe(size({showFiles: true}))
-        .pipe(csscomb())
         .pipe(concat('ui.css'))
         .pipe(size({title: 'Concatenated Css'}))
-        .pipe(uncss({
-            html: [basePath.dist + 'index.html']
-        }))
         .pipe(size({title: 'uncss'}))
         .pipe(minify())
         .pipe(rename({suffix: '.min'}))
@@ -94,89 +65,11 @@ gulp.task('buildJs', ['buildCss'], function() {
         appPaths.js + 'app.js',
         '!' + appPaths.js + 'libs/{html5js,html5js/**}'
     ])
-        .pipe(plumber())
         .pipe(concat('ui.js'))
-        /*.pipe(assetpaths({
-         newDomain: '.',
-         oldDomain : 'old-domain',
-         docRoot : 'dist',
-         filetypes : ['php']
-         }))*/
         .pipe(uglify())
         .pipe(rename({suffix: '.min'}))
         .pipe(size())
         .pipe(gulp.dest('dist/js'))
-});
-
-gulp.task('buildIMG', ['cleanBuildDir'], function() {
-    return gulp.src([
-        appPaths.img + '**',
-        '!' + appPaths.img + '{ui,ui/**}'
-    ])
-        .pipe(plumber())
-        .pipe(imagemin({
-            progressive: true,
-            use: [pngquant()]
-        }))
-        .pipe(size({showFiles: true}))
-        .pipe(gulp.dest(distPaths.img));
-});
-
-gulp.task('buildFonts', ['cleanBuildDir'], function() {
-    return gulp.src(appPaths.fonts + '**')
-        .pipe(gulp.dest(distPaths.fonts));
-});
-
-gulp.task('buildPHP', ['cleanBuildDir'], function() {
-    return gulp.src(appPaths.phpCore + '**')
-        .pipe(gulp.dest(distPaths.phpCore));
-});
-
-/* --------------- WATCHERS AND LIVERELOAD--------------- */
-
-gulp.task('watch', ['connect'], function() {
-    gulp.watch(appPaths.img + '**', ['compressImg']);
-    gulp.watch(appPaths.scss + '**', ['compileScss']);
-    gulp.watch(appPaths.jade + '**', ['compileJade']);
-});
-
-gulp.task('compressImg', function() {
-    return gulp.src(appPaths.img + '**')
-        .pipe(newer(appPaths.img))
-        .pipe(imagemin({
-            progressive: true,
-            use: [pngquant()]
-        }))
-        .pipe(gulp.dest(appPaths.img));
-});
-
-gulp.task('compileJade', function() {
-    return gulp.src(appPaths.jade + '*.jade')
-        .pipe(plumber())
-        .pipe(jade({pretty: true}))
-        .pipe(gulp.dest(appPaths.html))
-        .pipe(connect.reload());
-});
-
-gulp.task('compileScss', function() {
-    return gulp.src(appPaths.scss + '**')
-        .pipe(plumber())
-        .pipe(compass({
-            config_file: 'config.rb',
-            css: 'app/css',
-            sass: 'app/scss'
-        }))
-        .pipe(gulp.dest('app/css'))
-        .pipe(connect.reload());
-});
-
-// server connect
-gulp.task('connect', function() {
-    connect.server({
-        root: 'app',
-        port: 8000,
-        livereload: true
-    });
 });
 
 gulp.task('default', ['buildApp']);
