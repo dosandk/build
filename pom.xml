@@ -50,12 +50,18 @@
                     <!--</execution>-->
 
                     <execution>
-                        <id>grunt build</id>
+                        <id>gulp build</id>
                         <goals>
                             <goal>gulp</goal>
                         </goals>
+
+                        <!-- optional: the default phase is "generate-resources" -->
+                        <phase>generate-resources</phase>
+
                         <configuration>
-                            <arguments>--no-color</arguments>
+                            <!-- optional: if not specified, it will run gulp's default
+                            task (and you can remove this whole <configuration> section.) -->
+                            <arguments>build</arguments>
                         </configuration>
                     </execution>
 
