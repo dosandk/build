@@ -44,7 +44,7 @@ gulp.task('cleanBuildDir', function (cb) {
 gulp.task('buildHTML', ['cleanBuildDir'], function() {
     gulp.src(appPaths.jade +'*.jade')
         .pipe(jade({pretty: true}))
-        .pipe(gulp.dest(basePath.dist))
+        .pipe(gulp.dest(basePath.dist));
 });
 
 gulp.task('buildCss', ['buildHTML'], function() {
@@ -69,7 +69,7 @@ gulp.task('buildJs', ['buildCss'], function() {
         .pipe(uglify())
         .pipe(rename({suffix: '.min'}))
         .pipe(size())
-        .pipe(gulp.dest('dist/js'))
+        .pipe(gulp.dest('dist/js'));
 });
 
 gulp.task('default', ['buildApp']);
