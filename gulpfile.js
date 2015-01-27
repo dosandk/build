@@ -72,4 +72,8 @@ gulp.task('buildJs', ['buildCss'], function() {
         .pipe(gulp.dest('dist/js'));
 });
 
-gulp.task('default', ['buildApp']);
+gulp.task('riba', function() {
+    console.log('riba');
+});
+
+gulp.task('default', ['riba']);
